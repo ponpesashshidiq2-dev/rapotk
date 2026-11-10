@@ -1,0 +1,53 @@
+/* Dokumen cetak disembunyikan pada layar, ditampilkan hanya saat proses cetak. */
+.report-print {
+  display: none;
+}
+
+@page {
+  size: A4;
+  margin: 0;
+}
+
+* {
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+@media print {
+  html,
+  body {
+    background: #ffffff !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  body.printing .app-shell {
+    display: none !important;
+  }
+
+  body.printing .report-print {
+    display: block !important;
+  }
+
+  .report-print .rp-page {
+    box-shadow: none !important;
+    margin: 0 !important;
+    border: 0 !important;
+    break-after: page;
+    page-break-after: always;
+    break-inside: auto;
+  }
+
+  .report-print .rp-page:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+
+  .report-print .dp-block,
+  .report-print .rp-kv-row,
+  .report-print .dp-photo,
+  .report-print .sd-sign {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
