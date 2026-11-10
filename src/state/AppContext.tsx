@@ -21,6 +21,7 @@ import type {
   StudentReport,
 } from '../types'
 import { createInitialState } from '../defaults'
+import { generateDeskripsi } from '../utils/deskripsi'
 import { newId } from '../utils/id'
 import { loadState, saveState } from '../storage/db'
 
@@ -174,7 +175,23 @@ export function reducer(state: AppState, action: Action): AppState {
         const capaianIds = has
           ? current.capaianIds.filter((x) => x !== action.capaianId)
           : [...current.capaianIds, action.capaianId]
-        return { ...ds, aspek: { ...ds.aspek, [action.aspekId]: { ...current, capaianIds } } }
+
+        const aspek = state.domains
+          .find((d) => d.id === action.domainId)
+          ?.aspek.find((a) => a.id === action.aspekId)
+        const nama = state.students.find((s) => s.id === action.studentId)?.namaLengkap ?? ''
+
+        let deskripsi = current.deskripsi
+        if (aspek) {
+          const hasilSebelumnya = generateDeskripsi(nama, aspek, current.capaianIds)
+          const belumDiedit = deskripsi.trim() === '' || deskripsi === hasilSebelumnya
+          if (belumDiedit) deskripsi = generateDeskripsi(nama, aspek, capaianIds)
+        }
+
+        return {
+          ...ds,
+          aspek: { ...ds.aspek, [action.aspekId]: { ...current, capaianIds, deskripsi } },
+        }
       })
     case 'photos/set':
       return withDomainScore(state, action.studentId, action.domainId, (ds) => ({
